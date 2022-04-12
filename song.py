@@ -6,23 +6,27 @@ import time
 
 
 class Song:
-    def __init__(self, path, ) -> None:
+    def __init__(self, path):
         self.path = path
         
         # self.duratoin = self._cal_the_duration()
-        self.process = None
+        self.process = Process(target=playsound, args=(self.path, ))
         self.duration = None
 
-    def start(self):
-        if self.process:
-            self.end()
-        process = Process(target=playsound, args=(self.path, ))
-        process.start()
-        self.process = process
+    # def start(self):
+        # if self.process:
+        #     self.end()
+        # process = Process(target=playsound, args=(self.path, ))
+       
+        # self.process = process
       
     def end(self):
-        if self.process:
-            self.process.terminate()
+        self.process.terminate()
+        
+    
+    def start(self):
+        self.process = Process(target=playsound, args=(self.path, ))
+        self.process.start()
 
     def set_path(self, path):
         self.end()
