@@ -1,8 +1,11 @@
+from curses.ascii import NUL
 from multiprocessing import Process 
 from playsound import playsound
 import wave
 import contextlib
 import time
+
+from sqlalchemy import null
 
 
 class Song:
@@ -21,10 +24,13 @@ class Song:
         # self.process = process
       
     def end(self):
-        self.process.terminate()
+        if self.process and self.process.is_alive():     
+            self.process.terminate()
         
     
     def start(self):
+        if self.process:
+            self.end()
         self.process = Process(target=playsound, args=(self.path, ))
         self.process.start()
 
@@ -49,6 +55,7 @@ class Song:
             print(timer, end="\r")
             time.sleep(1)
             t -= 1
+            
     def still_working(self):
         if self.process:
             return self.process.is_alive() 
