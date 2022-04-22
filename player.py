@@ -17,7 +17,7 @@ class Player:
         self.path = None                    # the path of the current song
         self.current_song = None            # song object
         self.current_index = None           # name of the current song
-        self.user = ' '                      # what action to take
+        self.user = ''                      # what action to take
         self.pause = False                  # flag to stop the song
         self.PLAYERSTATUS = False           # flag to control the player
         self.status = False                 # in case there is a song playing
@@ -51,16 +51,18 @@ class Player:
         elif self.music[self.next][:-4] != self.current_index and not self.pause:
             print("\n", self.music[self.next][:-4], " is currently playing.....")
             self.current_index = self.music[self.next][:-4]
-
+            
+    def _first_song(self):
+        self.choose_song()
+        self.change_path()
+        self.current_song = Song(self.path)
+        self.current_song.start()
+        self.user = ''
+        
     def play(self):
         self.PLAYERSTATUS = True
+        self._first_song() # choose first song and play
         while self.PLAYERSTATUS:
-            if self.user == ' ':  # choose first song and play
-                self.choose_song()
-                self.change_path()
-                self.current_song = Song(self.path)
-                self.current_song.start()
-                self.user = 'p'
 
             # check if there is a song working
             self.status = self.current_song.still_working()
