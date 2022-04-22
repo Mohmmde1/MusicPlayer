@@ -119,6 +119,7 @@ class Player:
         elif self.user == 'k':
             self.repeat = True
             print("NOTED")
+            self.user = ''
 
         elif self.user == 'random' and not self.status:
             self.next = randint(0, len(self.music)-1)
