@@ -20,6 +20,7 @@ class Player:
         self.PLAYERSTATUS = False           # flag to control the player
         self.pause = False                  # flag to stop the song
         self.status = False                 # in case there is a song playing
+        self.repeat = False                   # either keep the current song running or not
         self.user = ''                      # what action to take
 
     def _list_music(self):
@@ -53,7 +54,7 @@ class Player:
         elif self.music[self.next][:-4] != self.current_index and not self.pause:
             print("\n", self.music[self.next][:-4], " is currently playing.....\n")
             self.current_index = self.music[self.next][:-4]
-            print("Press\nq to quit\nn to go to next song\np to go back to previous song\ns to stop current song\nr to restart the current song\nd to display and choose the song\nrandom to make the status random\n>>> ", end='')
+            print("Press\nq to quit\nn to go to next song\np to go back to previous song\ns to stop current song\nr to restart the current song\nd to display and choose the song\nrandom to make the status random\nk to keep the current song\n>>> ", end='')
 
     def _first_song(self):
         self.choose_song()
@@ -74,9 +75,12 @@ class Player:
             if(i):
                 self.user = sys.stdin.readline().strip().lower()
 
-            if not self.status and not self.pause:      # to play next song as soon as
-                self.user = 'n'                         # the first has finished
-            
+            if not self.status and not self.pause:
+                if self.repeat:
+                    self.user = 'r'
+                else:                                       # to play next song as soon as
+                    self.user = 'n'                         # the first has finished
+
             # make an action based on the input user
             self.action()
         
@@ -112,6 +116,11 @@ class Player:
             self.change_path()
             self.user = ''
 
+        elif self.user == 'k':
+            self.repeat = True
+            print("NOTED")
+
         elif self.user == 'random' and not self.status:
             self.next = randint(0, len(self.music)-1)
             self.change_path()
+        
