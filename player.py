@@ -20,11 +20,14 @@ class Player:
         self.PLAYERSTATUS = False           # flag to control the player
         self.pause = False                  # flag to stop the song
         self.status = False                 # in case there is a song playing
-        self.repeat = False                   # either keep the current song running or not
+        self.repeat = False                 # either keep the current song running or not
         self.user = ''                      # what action to take
 
     def _list_music(self):
         return list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(self.folderPath)))
+    
+    def __hash__(self):
+        return 'love you'
 
     def choose_song(self):
         # while True:

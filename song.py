@@ -1,14 +1,13 @@
-from curses.ascii import NUL
 from multiprocessing import Process 
 from playsound import playsound
 import wave
 import contextlib
 import time
 
-from sqlalchemy import null
-
 
 class Song:
+    
+    __slots__ = ('path', 'process', 'duration', )
     def __init__(self, path):
         self.path = path
         
@@ -23,6 +22,16 @@ class Song:
        
         # self.process = process
       
+    def __eq__(self, __o: object) -> bool:
+        if object.__class__ is self.__class__:
+            return object.path == self.path
+        raise NotImplementedError
+    
+    def __ne__(self, __o: object) -> bool:
+        if object.__class__ == self.__class__:
+            return object.path != self.path
+        raise NotImplementedError
+    
     def end(self):
         if self.process and self.process.is_alive():     
             self.process.terminate()
