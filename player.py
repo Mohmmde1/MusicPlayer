@@ -22,12 +22,10 @@ class Player:
         self.status = False                 # in case there is a song playing
         self.repeat = False                 # either keep the current song running or not
         self.user = ''                      # what action to take
+        self.control = 'u'                  # either repaeat song, sequential, or random
 
     def _list_music(self):
         return list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(self.folderPath)))
-    
-    def __hash__(self):
-        return 'love you'
 
     def choose_song(self):
         # while True:
@@ -51,42 +49,70 @@ class Player:
         if self.pause and self.current_index != "Stopped":
             print("\nStopped ...\n")
             self.current_index = "Stopped"
-            print("Press\nq to quit\nn to go to next song\np to go back to previous song\ns to stop current song\nr to restart the current song\nd to display and choose the song\nrandom to make the status random\n>>> ", end='')
+            self._display_controllers()
 
-            
         elif self.music[self.next][:-4] != self.current_index and not self.pause:
-            print("\n", self.music[self.next][:-4], " is currently playing.....\n")
+            print("\n", self.music[self.next][:-4],
+                  " is currently playing.....\n")
             self.current_index = self.music[self.next][:-4]
-            print("Press\nq to quit\nn to go to next song\np to go back to previous song\ns to stop current song\nr to restart the current song\nd to display and choose the song\nrandom to make the status random\nk to keep the current song\n>>> ", end='')
+            self._display_controllers()
+    
+    def _display_controllers(self):
+        print("Press\
+            \nq to quit\
+            \nn to go to next song\
+            \np to go back to previous song\
+            \ns to stop current song\
+            \nr to restart the current song\
+            \nd to display and choose the song\
+            \nb to make the status random\
+            \nk to keep the current song\
+            \nu to make a sequential mode\
+            \n>>> ", end='')
 
     def _first_song(self):
         self.choose_song()
         self.change_path()
         self.current_song = Song(self.path)
         self.current_song.start()
-        
+
+    def _control_mode(self):
+        # Here player mange the mode when the song is finihsed 
+        # and not stopped:
+        # 1. k for keeping the next song 
+        # 2. b to pick random song
+        # 3. u to make it sequential mode (default)       
+        if not self.status and not self.pause:
+            if self.control == 'k':
+                self.user = 'r'
+            elif self.control == 'b': 
+                self.user = 'random'      
+            elif self.control == 'u':
+                self.user = 'n'       
+
+    def _input(self):
+        i, o, e = select.select([sys.stdin], [], [], 1)      
+        if i: # keyboard prssed detected
+            self.pause = False
+            self.user = sys.stdin.readline().strip().lower() 
+        else:
+            self.user = ''
+            
     def play(self):
         self.PLAYERSTATUS = True
-        self._first_song() # choose first song and play
+        self._first_song()  # choose first song and play
         while self.PLAYERSTATUS:
-            # check if there is a song working
-            self.status = self.current_song.still_working()
-            self.display_status()                              # display the current song
+            self.status = self.current_song.still_working()                 # check if there is a song working
+            self.display_status()                                           # display the current song
+            self._input()                                                   # wait for an input for 5 secs
+            self._control_mode()                                            # to control the mode
             
-            # wait for an input for 5 secs
-            i, o, e = select.select([sys.stdin], [], [], 5)
-            if(i):
-                self.user = sys.stdin.readline().strip().lower()
-
-            if not self.status and not self.pause:
-                if self.repeat:
-                    self.user = 'r'
-                else:                                       # to play next song as soon as
-                    self.user = 'n'                         # the first has finished
+            # to get control
+            self.control = self.user if self.user in "ubk" and self.user != '' else self.control
 
             # make an action based on the input user
             self.action()
-        
+
     def action(self):
         # to check @self.user
         if self.user == 'q':  # to end the program
@@ -94,37 +120,26 @@ class Player:
             self.PLAYERSTATUS = False
 
         elif self.user == 'n':
-            self.next = 0 if self.next + 1 > len(self.music)-1 else self.next + 1
+            self.next = 0 if self.next + \
+                1 > len(self.music)-1 else self.next + 1
             self.change_path()
-            self.user = ''
-            self.pause = False
 
         elif self.user == 'p':
             self.next = self.next - 1 if self.next-1 > - \
                 len(self.music) else len(self.music)-1
             self.change_path()
-            self.user = ''
 
-        elif self.user == 's':  # to pause the song
+        elif self.user == 's':  
             self.current_song.end()
             self.pause = True
-            self.user = ''
 
         elif self.user == 'r':
             self.current_song.start()
-            self.user = ''
 
         elif self.user == 'd':
             self.choose_song()
             self.change_path()
-            self.user = ''
 
-        elif self.user == 'k':
-            self.repeat = True
-            print("NOTED")
-            self.user = ''
-
-        elif self.user == 'random' and not self.status:
+        elif self.user == 'random':
             self.next = randint(0, len(self.music)-1)
             self.change_path()
-        
