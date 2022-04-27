@@ -93,8 +93,9 @@ class Player:
     def _input(self):
         i, o, e = select.select([sys.stdin], [], [], 1)      
         if i: # keyboard prssed detected
-            self.pause = False
             self.user = sys.stdin.readline().strip().lower() 
+            if self.user in "qnpr":
+                self.pause = False
         else:
             self.user = ''
             
