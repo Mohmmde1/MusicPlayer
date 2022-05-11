@@ -19,7 +19,7 @@ class Player:
         self.path = None                    # the path of the current song
         self.PLAYERSTATUS = False           # flag to control the player
         self.pause = False                  # flag to stop the song
-        self.status = False                 # in case there is a song playing
+        self.is_playing = False             # in case there is a song playing
         self.repeat = False                 # either keep the current song running or not
         self.user = ''                      # what action to take
         self.control = 'u'                  # either repaeat song, sequential, or random
@@ -52,8 +52,7 @@ class Player:
             self._display_controllers()
 
         elif self.music[self.next][:-4] != self.current_index and not self.pause:
-            print("\n", self.music[self.next][:-4],
-                  " is currently playing.....\n")
+            print("\n", self.music[self.next][:-4], " is currently playing.....\n")
             self.current_index = self.music[self.next][:-4]
             self._display_controllers()
     
@@ -82,7 +81,7 @@ class Player:
         # 1. k for keeping the next song 
         # 2. b to pick random song
         # 3. u to make it sequential mode (default)       
-        if not self.status and not self.pause:
+        if not self.is_playing and not self.pause:
             if self.control == 'k':
                 self.user = 'r'
             elif self.control == 'b': 
@@ -94,7 +93,7 @@ class Player:
         i, o, e = select.select([sys.stdin], [], [], 1)      
         if i: # keyboard prssed detected
             self.user = sys.stdin.readline().strip().lower() 
-            if self.user in "qnpr":
+            if self.user in set("qnpr"):
                 self.pause = False
         else:
             self.user = ''
@@ -103,14 +102,14 @@ class Player:
         self.PLAYERSTATUS = True
         self._first_song()  # choose first song and play
         while self.PLAYERSTATUS:
-            self.status = self.current_song.still_working()                 # check if there is a song working
+            self.is_playing = self.current_song.still_working()             # check if there is a song working
             self.display_status()                                           # display the current song
             self._input()                                                   # wait for an input for 5 secs
-            self._control_mode()                                            # to control the mode
+            self._control_mode()                                            # to control the mode and must be called after _input 
             
             # to get control
-            self.control = self.user if self.user in "ubk" and self.user != '' else self.control
-
+            self.control = self.user if self.user in set("ubk") else self.control
+            
             # make an action based on the input user
             self.action()
 
@@ -120,6 +119,10 @@ class Player:
             self.current_song.end()
             self.PLAYERSTATUS = False
 
+        elif self.user == 'random':
+            self.next = randint(0, len(self.music)-1)
+            self.change_path()
+        
         elif self.user == 'n':
             self.next = 0 if self.next + \
                 1 > len(self.music)-1 else self.next + 1
@@ -141,6 +144,3 @@ class Player:
             self.choose_song()
             self.change_path()
 
-        elif self.user == 'random':
-            self.next = randint(0, len(self.music)-1)
-            self.change_path()
