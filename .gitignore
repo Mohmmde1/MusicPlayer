@@ -132,3 +132,4 @@ dmypy.json
 *.wav
 
 .DS_Store
+pygamePlayer.py
