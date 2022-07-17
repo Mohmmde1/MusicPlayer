@@ -15,7 +15,6 @@ class Player():
     next = 0                       # the index
     folderPath = "/users/mohammedalnashrei/Desktop/Music/"      # where the muisc files are
     music = list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(folderPath)))     # list contains the songs' names
-
     current_song = None            # song object
     current_index = None           # name of the current song
     path = None                    # the path of the current song
@@ -29,6 +28,7 @@ class Player():
 
  
     @staticmethod
+    @click.command()
     def choose_song():
         # while True:
         Player.display_songs()
@@ -50,6 +50,7 @@ class Player():
             print(value[:-4], index+1, sep=" ")
 
     @staticmethod
+    @click.command()
     def display_status():
         if Player.pause and Player.current_index != "Stopped":
             print("\nStopped ...\n")
@@ -62,6 +63,7 @@ class Player():
             Player._display_controllers()
     
     @staticmethod
+    @click.command()
     def _display_controllers():
         print("Press\
             \nq to quit\
@@ -83,6 +85,7 @@ class Player():
         Player.current_song.start()
 
     @staticmethod
+    @click.command()
     def _control_mode():
         # Here player mange the mode when the song is finihsed 
         # and not stopped:
@@ -98,6 +101,7 @@ class Player():
                 Player.user = 'n'       
 
     @staticmethod
+    @click.command()
     def _input():
         i, o, e = select.select([sys.stdin], [], [], 1)      
         if i: # keyboard prssed detected
