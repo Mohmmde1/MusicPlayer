@@ -134,3 +134,5 @@ dmypy.json
 .DS_Store
 pygamePlayer.py
 temp.md
+backgroundlog
+backgroundprocess.py
