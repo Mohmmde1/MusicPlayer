@@ -1,62 +1,68 @@
 
 from song import Song
 
+
+import click
 import os
 import os.path
-from playsound import playsound
+
 import sys
 import select
 from random import randint
 
 
-class Player:
-    def __init__(self, folder_path="/users/mohammedalnashrei/Desktop/Music/"):
-        self.folderPath = folder_path       # where the muisc files are
-        self.music = self._list_music()     # list contains the songs' names
-        self.next = 0                       # the index
-        self.current_song = None            # song object
-        self.current_index = None           # name of the current song
-        self.path = None                    # the path of the current song
-        self.PLAYERSTATUS = False           # flag to control the player
-        self.pause = False                  # flag to stop the song
-        self.is_playing = False             # in case there is a song playing
-        self.repeat = False                 # either keep the current song running or not
-        self.user = ''                      # what action to take
-        self.control = 'u'                  # either repaeat song, sequential, or random
+class Player():
+    next = 0                       # the index
+    folderPath = "/users/mohammedalnashrei/Desktop/Music/"      # where the muisc files are
+    music = list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(folderPath)))     # list contains the songs' names
 
-    def _list_music(self):
-        return list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(self.folderPath)))
+    current_song = None            # song object
+    current_index = None           # name of the current song
+    path = None                    # the path of the current song
+    PLAYERSTATUS = False           # flag to control the player
+    pause = False                  # flag to stop the song
+    is_playing = False             # in case there is a song playing
+    repeat = False                 # either keep the current song running or not
+    user = ''                      # what action to take
+    control = 'u'                  # either repaeat song, sequential, or random
 
-    def choose_song(self):
+
+ 
+    @staticmethod
+    def choose_song():
         # while True:
-        self.display_songs()
+        Player.display_songs()
         # try:
-        self.next = int(input("Insert the number of the song\n>>> ")) - 1
+        Player.next = int(input("Insert the number of the song\n>>> ")) - 1
         # return
         # except:
-        # print("Insert a value from 1-{}".format(len(self.music)))
+        # print("Insert a value from 1-{}".format(len(music)))
 
-    def change_path(self):
-        self.path = os.path.join(self.folderPath, self.music[self.next])
-        if self.current_song:
-            self.current_song.set_path(self.path)
+    @staticmethod
+    def change_path():
+        Player.path = os.path.join(Player.folderPath, Player.music[Player.next])
+        if Player.current_song:
+            Player.current_song.set_path(Player.path)
 
-    def display_songs(self):
-        for index, value in enumerate(self.music):
+    @staticmethod
+    def display_songs():
+        for index, value in enumerate(Player.music):
             print(value[:-4], index+1, sep=" ")
 
-    def display_status(self):
-        if self.pause and self.current_index != "Stopped":
+    @staticmethod
+    def display_status():
+        if Player.pause and Player.current_index != "Stopped":
             print("\nStopped ...\n")
-            self.current_index = "Stopped"
-            self._display_controllers()
+            Player.current_index = "Stopped"
+            Player._display_controllers()
 
-        elif self.music[self.next][:-4] != self.current_index and not self.pause:
-            print("\n", self.music[self.next][:-4], " is currently playing.....\n")
-            self.current_index = self.music[self.next][:-4]
-            self._display_controllers()
+        elif Player.music[Player.next][:-4] != Player.current_index and not Player.pause:
+            print("\n", Player.music[Player.next][:-4], " is currently playing.....\n")
+            Player.current_index = Player.music[Player.next][:-4]
+            Player._display_controllers()
     
-    def _display_controllers(self):
+    @staticmethod
+    def _display_controllers():
         print("Press\
             \nq to quit\
             \nn to go to next song\
@@ -69,78 +75,85 @@ class Player:
             \nu to make a sequential mode\
             \n>>> ", end='')
 
-    def _first_song(self):
-        self.choose_song()
-        self.change_path()
-        self.current_song = Song(self.path)
-        self.current_song.start()
+    @staticmethod
+    def _first_song():
+        Player.choose_song()
+        Player.change_path()
+        Player.current_song = Song(Player.path)
+        Player.current_song.start()
 
-    def _control_mode(self):
+    @staticmethod
+    def _control_mode():
         # Here player mange the mode when the song is finihsed 
         # and not stopped:
         # 1. k for keeping the next song 
         # 2. b to pick random song
         # 3. u to make it sequential mode (default)       
-        if not self.is_playing and not self.pause:
-            if self.control == 'k':
-                self.user = 'r'
-            elif self.control == 'b': 
-                self.user = 'random'      
-            elif self.control == 'u':
-                self.user = 'n'       
+        if not Player.is_playing and not Player.pause:
+            if Player.control == 'k':
+                Player.user = 'r'
+            elif Player.control == 'b': 
+                Player.user = 'random'      
+            elif Player.control == 'u':
+                Player.user = 'n'       
 
-    def _input(self):
+    @staticmethod
+    def _input():
         i, o, e = select.select([sys.stdin], [], [], 1)      
         if i: # keyboard prssed detected
-            self.user = sys.stdin.readline().strip().lower() 
-            if self.user in set("qnpr"):
-                self.pause = False
+            Player.user = sys.stdin.readline().strip().lower() 
+            if Player.user in set("qnpr"):
+                Player.pause = False
         else:
-            self.user = ''
-            
-    def play(self):
-        self.PLAYERSTATUS = True
-        self._first_song()  # choose first song and play
-        while self.PLAYERSTATUS:
-            self.is_playing = self.current_song.still_working()             # check if there is a song working
-            self.display_status()                                           # display the current song
-            self._input()                                                   # wait for an input for 5 secs
-            self._control_mode()                                            # to control the mode and must be called after _input 
+            Player.user = ''
+    
+    @staticmethod
+    @click.command(help="Play song")
+    def play():
+        Player.PLAYERSTATUS = True
+        Player._first_song()  # choose first song and play
+        while Player.PLAYERSTATUS:
+            Player.is_playing = Player.current_song.still_working()             # check if there is a song working
+            Player.display_status()                                           # display the current song
+            Player._input()                                                   # wait for an input for 5 secs
+            Player._control_mode()                                            # to control the mode and must be called after _input 
             
             # to get control
-            self.control = self.user if self.user in set("ubk") else self.control
+            Player.control = Player.user if Player.user in set("ubk") else Player.control
             
             # make an action based on the input user
-            self.action()
+            Player.action()
 
-    def action(self):
-        # to check @self.user
-        if self.user == 'q':  # to end the program
-            self.current_song.end()
-            self.PLAYERSTATUS = False
 
-        elif self.user == 'random':
-            self.next = randint(0, len(self.music)-1)
-            self.change_path()
+    @staticmethod
+    def action():
+        # to check @user
+        if Player.user == 'q':  # to end the program
+            Player.current_song.end()
+            Player.PLAYERSTATUS = False
+
+        elif Player.user == 'random':
+            Player.next = randint(0, len(Player.music)-1)
+            Player.change_path()
         
-        elif self.user == 'n':
-            self.next = 0 if self.next + \
-                1 > len(self.music)-1 else self.next + 1
-            self.change_path()
+        elif Player.user == 'n':
+            Player.next = 0 if Player.next + \
+                1 > len(Player.music)-1 else Player.next + 1
+            Player.change_path()
 
-        elif self.user == 'p':
-            self.next = self.next - 1 if self.next-1 > - \
-                len(self.music) else len(self.music)-1
-            self.change_path()
+        elif Player.user == 'p':
+            Player.next = Player.next - 1 if Player.next-1 > - \
+                len(Player.music) else len(Player.music)-1
+            Player.change_path()
 
-        elif self.user == 's':  
-            self.current_song.end()
-            self.pause = True
+        elif Player.user == 's':  
+            Player.current_song.end()
+            Player.pause = True
 
-        elif self.user == 'r':
-            self.current_song.start()
+        elif Player.user == 'r':
+            Player.current_song.start()
 
-        elif self.user == 'd':
-            self.choose_song()
-            self.change_path()
+        elif Player.user == 'd':
+            Player.choose_song()
+            Player.change_path()
 
