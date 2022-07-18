@@ -127,7 +127,7 @@ class Player():
 
         Player._first_song()  # choose first song and play
         while Player.PLAYERSTATUS:
-            Player.is_playing = Player.current_song.still_working()             # check if there is a song working
+            Player.is_playing = Player.current_song.still_working()           # check if there is a song working
             Player.display_status()                                           # display the current song
             Player._input()                                                   # wait for an input for 5 secs
             Player._control_mode()                                            # to control the mode and must be called after _input 
