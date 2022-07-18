@@ -1,19 +1,23 @@
 
 from song import Song
-
+from dotenv import load_dotenv
 
 import click
 import os
-import os.path
+
 
 import sys
 import select
 from random import randint
 
 
+load_dotenv()
+
+
+
 class Player():
     next = 0                       # the index
-    folderPath = "/users/mohammedalnashrei/Desktop/Music/"      # where the muisc files are
+    folderPath =  os.getenv('folder_path')    # where the muisc files are
     music = list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(folderPath)))     # list contains the songs' names
     current_song = None            # song object
     current_index = None           # name of the current song
@@ -28,18 +32,21 @@ class Player():
 
  
     @staticmethod
-    @click.command()
+    # @click.command()
     def choose_song():
+
         # while True:
         Player.display_songs()
         # try:
         Player.next = int(input("Insert the number of the song\n>>> ")) - 1
+
         # return
         # except:
-        # print("Insert a value from 1-{}".format(len(music)))
+        print("Insert a value from 1-{}".format(len(Player.music)))
 
     @staticmethod
     def change_path():
+
         Player.path = os.path.join(Player.folderPath, Player.music[Player.next])
         if Player.current_song:
             Player.current_song.set_path(Player.path)
@@ -50,7 +57,7 @@ class Player():
             print(value[:-4], index+1, sep=" ")
 
     @staticmethod
-    @click.command()
+    # @click.command()
     def display_status():
         if Player.pause and Player.current_index != "Stopped":
             print("\nStopped ...\n")
@@ -63,7 +70,7 @@ class Player():
             Player._display_controllers()
     
     @staticmethod
-    @click.command()
+    # @click.command()
     def _display_controllers():
         print("Press\
             \nq to quit\
@@ -79,13 +86,15 @@ class Player():
 
     @staticmethod
     def _first_song():
+
         Player.choose_song()
+        print("HI")
         Player.change_path()
         Player.current_song = Song(Player.path)
         Player.current_song.start()
 
     @staticmethod
-    @click.command()
+    # @click.command()
     def _control_mode():
         # Here player mange the mode when the song is finihsed 
         # and not stopped:
@@ -101,7 +110,7 @@ class Player():
                 Player.user = 'n'       
 
     @staticmethod
-    @click.command()
+    # @click.command()
     def _input():
         i, o, e = select.select([sys.stdin], [], [], 1)      
         if i: # keyboard prssed detected
@@ -112,9 +121,10 @@ class Player():
             Player.user = ''
     
     @staticmethod
-    @click.command(help="Play song")
+    @click.command()    
     def play():
         Player.PLAYERSTATUS = True
+
         Player._first_song()  # choose first song and play
         while Player.PLAYERSTATUS:
             Player.is_playing = Player.current_song.still_working()             # check if there is a song working
