@@ -1,14 +1,13 @@
 
 from song import Song
 from dotenv import load_dotenv
+from random import randint
 
 import click
 import os
-
-
 import sys
 import select
-from random import randint
+
 
 
 load_dotenv()
@@ -22,8 +21,8 @@ class Player():
     current_song = None            # song object
     current_index = None           # name of the current song
     path = None                    # the path of the current song
-    PLAYERSTATUS = False           # flag to control the player
-    pause = False                  # flag to stop the song
+    PLAYERSTATUS = os.getenv("PLAYERSTATUS") == "True" # flag to control the player
+    pause = os.getenv("PAUSE") == "True"                  # flag to stop the song
     is_playing = False             # in case there is a song playing
     repeat = False                 # either keep the current song running or not
     user = ''                      # what action to take
@@ -88,7 +87,6 @@ class Player():
     def _first_song():
 
         Player.choose_song()
-        print("HI")
         Player.change_path()
         Player.current_song = Song(Player.path)
         Player.current_song.start()
@@ -123,7 +121,7 @@ class Player():
     @staticmethod
     @click.command()    
     def play():
-        Player.PLAYERSTATUS = True
+        os.environ["PLAYERSTATUS"] = "True"
 
         Player._first_song()  # choose first song and play
         while Player.PLAYERSTATUS:
