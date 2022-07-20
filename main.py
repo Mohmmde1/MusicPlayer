@@ -10,4 +10,6 @@ cli.add_command(player.Player.play)
 
 
 if __name__ == '__main__':
+    
     cli()
+    print("HI")

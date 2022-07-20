@@ -1,6 +1,6 @@
 
 from song import Song
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv, set_key
 from random import randint
 
 import click
@@ -9,8 +9,8 @@ import sys
 import select
 
 
-
-load_dotenv()
+dotenv_file = find_dotenv()
+load_dotenv(dotenv_path=".env")
 
 
 
@@ -84,9 +84,8 @@ class Player():
             \n>>> ", end='')
 
     @staticmethod
-    def _first_song():
-
-        Player.choose_song()
+    def play_random_song():
+        Player.next = randint(0, len(Player.music)-1)
         Player.change_path()
         Player.current_song = Song(Player.path)
         Player.current_song.start()
@@ -121,20 +120,15 @@ class Player():
     @staticmethod
     @click.command()    
     def play():
-        os.environ["PLAYERSTATUS"] = "True"
-
-        Player._first_song()  # choose first song and play
+        
+        set_key(dotenv_file, "PLAYERSTATUS", "True")
+        Player.play_random_song()  
         while Player.PLAYERSTATUS:
             Player.is_playing = Player.current_song.still_working()           # check if there is a song working
-            Player.display_status()                                           # display the current song
-            Player._input()                                                   # wait for an input for 5 secs
             Player._control_mode()                                            # to control the mode and must be called after _input 
+            if not Player.is_playing:
+                Player.play_random_song()
             
-            # to get control
-            Player.control = Player.user if Player.user in set("ubk") else Player.control
-            
-            # make an action based on the input user
-            Player.action()
 
 
     @staticmethod
