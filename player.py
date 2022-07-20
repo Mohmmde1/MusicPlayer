@@ -1,4 +1,5 @@
 
+from email.policy import default
 from song import Song
 from dotenv import load_dotenv, find_dotenv, set_key
 from random import randint
@@ -15,6 +16,9 @@ load_dotenv(dotenv_path=".env")
 
 
 class Player():
+    # REPEAT = False                  #  either the current song running or not
+    # SEQUENTIAL = False              #  flag to track sequential mode
+    # RANDOM = False                  #  flag to track random mode
     next = 0                       # the index
     folderPath =  os.getenv('folder_path')    # where the muisc files are
     music = list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(folderPath)))     # list contains the songs' names
@@ -25,29 +29,29 @@ class Player():
     pause = os.getenv("PAUSE") == "True"                  # flag to stop the song
     is_playing = False             # in case there is a song playing
     repeat = False                 # either keep the current song running or not
-    user = ''                      # what action to take
     control = 'u'                  # either repaeat song, sequential, or random
 
 
  
     @staticmethod
-    # @click.command()
     def choose_song():
-
-        # while True:
-        Player.display_songs()
-        # try:
-        Player.next = int(input("Insert the number of the song\n>>> ")) - 1
-
-        # return
-        # except:
-        print("Insert a value from 1-{}".format(len(Player.music)))
+        length = len(Player.music)
+        while True:
+            Player.display_songs()
+            try:
+                Player.next = int(input("Insert the number of the song\n>>> ")) - 1
+                if Player.next >= length or Player.next < 0:
+                    raise Exception()
+                return
+            except:
+                print("Insert a value from 1-{}".format(length))
 
     @staticmethod
     def change_path():
 
         Player.path = os.path.join(Player.folderPath, Player.music[Player.next])
         if Player.current_song:
+            print(type(Player.current_song))
             Player.current_song.set_path(Player.path)
 
     @staticmethod
@@ -56,7 +60,6 @@ class Player():
             print(value[:-4], index+1, sep=" ")
 
     @staticmethod
-    # @click.command()
     def display_status():
         if Player.pause and Player.current_index != "Stopped":
             print("\nStopped ...\n")
@@ -69,7 +72,6 @@ class Player():
             Player._display_controllers()
     
     @staticmethod
-    # @click.command()
     def _display_controllers():
         print("Press\
             \nq to quit\
@@ -107,19 +109,28 @@ class Player():
                 Player.user = 'n'       
 
     @staticmethod
-    # @click.command()
-    def _input():
-        i, o, e = select.select([sys.stdin], [], [], 1)      
-        if i: # keyboard prssed detected
-            Player.user = sys.stdin.readline().strip().lower() 
-            if Player.user in set("qnpr"):
-                Player.pause = False
-        else:
-            Player.user = ''
+    @click.command()
+    def current_song_status():
+        pass
     
-    @staticmethod
-    @click.command()    
-    def play():
+    @click.command()
+    @click.option('-chs', '--choose-song', is_flag=True)   
+    @click.option('-q', '--quit' ,is_flag=True)
+    @click.option('-r', '--random' ,is_flag=True) 
+    @click.option('-s', '--sequential' ,is_flag=True)
+    @click.option('-f', '--frequent', is_flag=True)
+    def play(choose_song, quit, random, sequential, frequent):
+        if choose_song:
+            Player.choose_song()
+            return
+        elif quit:
+            pass
+        elif random:
+            pass
+        elif sequential:
+            pass
+        elif frequent:
+            pass
         
         set_key(dotenv_file, "PLAYERSTATUS", "True")
         Player.play_random_song()  
@@ -129,6 +140,7 @@ class Player():
             if not Player.is_playing:
                 Player.play_random_song()
             
+
 
 
     @staticmethod
