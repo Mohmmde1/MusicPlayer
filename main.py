@@ -6,7 +6,7 @@ def cli():
     pass
 
 cli.add_command(player.Player.play)
-# cli.add_command(player.Player.choose_song)
+cli.add_command(player.Player.current_song_status)
 
 
 
