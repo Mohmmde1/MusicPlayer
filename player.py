@@ -54,7 +54,7 @@ class Player():
     @staticmethod
     @click.command()
     def status():
-        pass
+        print(Config.get_song_name()[:-3] + " is currently playing ....")
     
     @click.command()
     @click.option('-cs', '--choose-song', is_flag=True)   
@@ -63,6 +63,7 @@ class Player():
     @click.option('-s', '--sequential' ,is_flag=True)
     @click.option('-f', '--frequent', is_flag=True)
     def play(choose_song, quit, random, sequential, frequent): 
+        Config.start()
         while True:
             if not Player.is_playing:
                 if choose_song:
@@ -84,6 +85,7 @@ class Player():
                 Player.change_path()
                 Player.current_song = Song(Player.path)
                 Player.current_song.start()
+                Config.set_song_name(Player.music[Player.next])
                 
             Player.is_playing = Player.current_song.still_working()           # check if there is a song working
             
