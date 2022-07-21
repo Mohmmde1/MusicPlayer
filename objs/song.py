@@ -1,6 +1,6 @@
 from multiprocessing import Process 
 from playsound import playsound
-from config import Config
+from config.config import Config
 import wave
 import contextlib
 import time

@@ -1,14 +1,15 @@
-from song import Song
+import sys
+from objs.song import Song
 from random import randint
-from config import Config
+from config.config import Config
 
 import click
 import os
 
 class Player():
     next = 0                       # the index of the current song 
-    folderPath =  Config.get_path()     # where the muisc files are
-    music = list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(folderPath)))     # list contains the songs' names
+    FolderPath =  Config.get_path()     # where the muisc files are
+    music = list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(FolderPath)))     # list contains the songs' names
     current_song = None            # song object
     path = None                    # the path of the current song
     is_playing = False             # in case there is a song playing
@@ -28,7 +29,7 @@ class Player():
 
     @staticmethod
     def change_path():
-        Player.path = os.path.join(Player.folderPath, Player.music[Player.next])
+        Player.path = os.path.join(Player.FolderPath, Player.music[Player.next])
         if Player.current_song:
             Player.current_song.set_path(Player.path)
 
@@ -54,7 +55,10 @@ class Player():
     @staticmethod
     @click.command()
     def status():
-        print(Config.get_song_name()[:-3] + " is currently playing ....")
+        if Config.get_song_status():
+            print(Config.get_song_name()[:-3] + " is currently playing ....")
+        else:
+            print("No song is playing")
     
     @click.command()
     @click.option('-cs', '--choose-song', is_flag=True)   
@@ -71,6 +75,7 @@ class Player():
 
                 elif quit:
                     Config.end()
+                    sys.exit()
 
                 elif sequential:
                     Player.next = 0 if Player.next + \

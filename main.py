@@ -1,6 +1,6 @@
-import player
+import objs.player as player
 import click
-from config import Config
+from config.config import Config
 
 
 

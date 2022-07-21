@@ -25,7 +25,7 @@ class Config:
     @staticmethod
     def end():
         set_key(Config.dotenv_file, "PLAYERSTATUS", str(False))
-        sys.exit()
+
 
     
     @staticmethod
@@ -44,4 +44,7 @@ class Config:
             return os.getenv("SONG_NAME")
         except:
             return None
+        
+    def get_song_status():
+        return os.getenv("PLAYERSTATUS") == "True"
     
