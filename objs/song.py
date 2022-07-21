@@ -1,5 +1,6 @@
 from multiprocessing import Process 
 from playsound import playsound
+from config.config import Config
 import wave
 import contextlib
 import time
@@ -14,6 +15,7 @@ class Song:
         # self.duratoin = self._cal_the_duration()
         self.process = Process(target=playsound, args=(self.path, ))
         self.duration = None
+
 
     # def start(self):
         # if self.process:
@@ -42,6 +44,7 @@ class Song:
             self.end()
         self.process = Process(target=playsound, args=(self.path, ))
         self.process.start()
+        Config.set_song_pid(self.process.pid)
 
     def set_path(self, path):
         self.end()
