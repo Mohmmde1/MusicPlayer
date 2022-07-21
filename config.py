@@ -8,9 +8,10 @@ class Config:
     
     @staticmethod
     def start():
-        # check if the player is on that means i should stop close first teh last script
         if os.getenv("PLAYERSTATUS") == "True":
             os.system("kill -9 " + os.getenv("PID"))
+            if os.getenv("SONG_PID"):
+                os.system("kill -9 " + os.getenv("SONG_PID"))
             
         set_key(Config.dotenv_file, "PID", str(os.getpid()))
         set_key(Config.dotenv_file, "PLAYERSTATUS", str(True))
@@ -25,5 +26,9 @@ class Config:
     @staticmethod
     def get_path():
         return os.getenv("FOLDER_PATH")
+    
+    @staticmethod
+    def set_song_pid(pid):
+        set_key(Config.dotenv_file, "SONG_PID", str(pid))
         
     
