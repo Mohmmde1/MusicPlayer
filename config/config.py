@@ -1,6 +1,5 @@
 from concurrent.futures import process
 import os
-import signal
 from psutil import pid_exists
 from dotenv import load_dotenv, find_dotenv, set_key
 import psutil
@@ -13,20 +12,12 @@ class Config:
     def start():
         if os.getenv("PLAYERSTATUS") == "True":
             PID = int(os.getenv("PID"))
-            # SONG_PID = int(os.getenv("SONG_PID"))
-            
-            # safe guard to check if the song and the player are running
-            # if pid_exists(SONG_PID):
-            #     os.kill(SONG_PID, signal.SIGTERM)
+
             if pid_exists(PID):
-                proc, children = Config.get_script_children_processes_by_id(PID)
+                proc, children = Config.get_children_processes_by_id(PID)
                 for child in children:
-                    child.kill()
-                proc.kill()
-                
-            # to update the player status into False
-            # if not pid_exists(PID):
-            #     Config.end()
+                    child.terminate()
+                proc.terminate()
             
         set_key(Config.dotenv_file, "PID", str(os.getpid()))
         set_key(Config.dotenv_file, "PLAYERSTATUS", str(True))
@@ -42,9 +33,6 @@ class Config:
     def get_path():
         return os.getenv("FOLDER_PATH")
     
-    @staticmethod
-    def set_song_pid(pid):
-        set_key(Config.dotenv_file, "SONG_PID", str(pid))
         
     def set_song_name(name):
         set_key(Config.dotenv_file, "SONG_NAME", name)
@@ -57,9 +45,9 @@ class Config:
         
     def get_song_status():
         return os.getenv("PLAYERSTATUS") == "True"
+    
     @staticmethod
-    def get_script_children_processes_by_id(script_id):
-
+    def get_children_processes_by_id(script_id):
         children = []
         process = None
         for proc in psutil.process_iter():
@@ -68,11 +56,11 @@ class Config:
                     process = proc
                     for child in proc.children():
                         children.append(child)
+                    break
 
             except psutil.NoSuchProcess:
                 continue
-            
-        return proc, children
+        return process, children
                 
             
 

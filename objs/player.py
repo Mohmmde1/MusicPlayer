@@ -68,6 +68,10 @@ class Player():
     @click.option('-f', '--frequent', is_flag=True)
     def play(choose_song, quit, random, sequential, frequent): 
         Config.start()
+        if not Player.current_song:
+            # extra safe guard
+            Player.current_song = Song()
+            
         while True:
             if not Player.is_playing:
                 if choose_song:
@@ -86,9 +90,9 @@ class Player():
                     
                 elif random:
                     Player.next = randint(0, len(Player.music)-1)
+
                     
                 Player.change_path()
-                Player.current_song = Song(Player.path)
                 Player.current_song.start()
                 Config.set_song_name(Player.music[Player.next])
                 

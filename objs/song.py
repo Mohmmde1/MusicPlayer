@@ -1,4 +1,5 @@
-from multiprocessing import Process 
+from multiprocessing import Process
+from amqp import NotFound 
 from playsound import playsound
 from config.config import Config
 import wave
@@ -9,7 +10,7 @@ import time
 class Song:
     
     __slots__ = ('path', 'process', 'duration', )
-    def __init__(self, path):
+    def __init__(self, path=None):
         self.path = path
         
         # self.duratoin = self._cal_the_duration()
@@ -40,11 +41,18 @@ class Song:
         
     
     def start(self):
+        if self.path == None:
+            print("insert path for the song")
+            return
+        
         if self.process:
             self.end()
+        
         self.process = Process(target=playsound, args=(self.path, ))
+        
+        
         self.process.start()
-        Config.set_song_pid(self.process.pid)
+
 
     def set_path(self, path):
         self.end()
