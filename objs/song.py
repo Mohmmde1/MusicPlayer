@@ -50,7 +50,7 @@ class Song:
         
         self.process = Process(target=playsound, args=(self.path, ))
         
-        
+        self.process.daemon = True
         self.process.start()
 
 
