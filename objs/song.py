@@ -13,7 +13,7 @@ class Song:
         self.path = path
         
         # self.duratoin = self._cal_the_duration()
-        self.process = Process(target=playsound, args=(self.path, ))
+        self.process = None
         self.duration = None
 
 
@@ -35,7 +35,7 @@ class Song:
         raise NotImplementedError
     
     def end(self):
-        if self.process and self.process.is_alive():     
+        if self.process:     
             self.process.terminate()
         
     

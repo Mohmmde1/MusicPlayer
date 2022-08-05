@@ -84,7 +84,7 @@ class Player():
                 elif frequent:
                     Player.next = Player.next
                     
-                else:
+                elif random:
                     Player.next = randint(0, len(Player.music)-1)
                     
                 Player.change_path()

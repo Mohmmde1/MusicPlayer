@@ -14,5 +14,8 @@ cli.add_command(player.Player.status)
 
 
 if __name__ == '__main__':
-    cli()
+    try:
+        cli()
+    finally:
+        Config.end()
 
