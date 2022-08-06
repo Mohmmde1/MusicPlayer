@@ -36,6 +36,9 @@ class Config:
         
     def set_song_name(name):
         set_key(Config.dotenv_file, "SONG_NAME", name)
+    
+    def set_song_index(index):
+        set_key(Config.dotenv_file, "INDEX", str(index))
         
     def get_song_name():
         try:
@@ -61,6 +64,10 @@ class Config:
             except psutil.NoSuchProcess:
                 continue
         return process, children
+    
+    @staticmethod
+    def get_song_index():
+        return int(os.getenv("INDEX"))
                 
             
 

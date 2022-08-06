@@ -7,7 +7,7 @@ import click
 import os
 
 class Player():
-    next = 0                       # the index of the current song 
+    next = Config.get_song_index()                      # the index of the current song 
     FolderPath =  Config.get_path()     # where the muisc files are
     music = list(filter(lambda a: True if a[-1] == 'v' else False, os.listdir(FolderPath)))     # list contains the songs' names
     current_song = None            # song object
@@ -94,6 +94,7 @@ class Player():
                     
                 Player.change_path()
                 Player.current_song.start()
+                Config.set_song_index(Player.next)
                 Config.set_song_name(Player.music[Player.next])
                 
             Player.is_playing = Player.current_song.still_working()           # check if there is a song working
