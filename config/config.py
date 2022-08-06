@@ -5,8 +5,9 @@ from dotenv import load_dotenv, find_dotenv, set_key
 import psutil
 
 class Config:
+    file_path = "/Users/mohammedalnashrei/projects/MusicPlayer"
     dotenv_file = find_dotenv()
-    load_dotenv(dotenv_path=".env")
+    load_dotenv(dotenv_path=f"{file_path}/.env")
     
     @staticmethod
     def start():
